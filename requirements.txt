@@ -6,3 +6,5 @@ flask_restful
 pillow
 celery
 celery[redis]
+flask-apscheduler
+requests

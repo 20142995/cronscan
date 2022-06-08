@@ -85,7 +85,10 @@ def update_engine():
 def create_sub_task(task_name, source, engine_name, target):
     '''创建celery子任务'''
     log.info('create_sub_task')
-    task_id = celery_app.send_task(engine_name+'.run', (target,), queue=engine_name).id
+    if engine_name == 'rad':
+        task_id = celery_app.send_task(engine_name+'.run', (target,True), queue=engine_name).id
+    else:
+        task_id = celery_app.send_task(engine_name+'.run', (target,), queue=engine_name).id
     sub1 = SubTask(id=task_id, task_engine=engine_name, task_target=str(target), task_status=AsyncResult(
         task_id, app=celery_app).status, is_save=False, source=source, task_name=task_name)
     db.session.add(sub1)

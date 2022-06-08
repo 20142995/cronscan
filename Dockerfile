@@ -6,7 +6,7 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
 
 RUN apt-get clean && apt-get update 
 
-RUN apt-get install -y python3 python3-pip language-pack-zh-hans fontconfig git wget  libtiff libjpeg webp little-cms2
+RUN apt-get install -y python3 python3-pip language-pack-zh-hans fontconfig git wget  build-essential libsqlite3-dev libpng-dev libjpeg-dev
 
 WORKDIR /app
 

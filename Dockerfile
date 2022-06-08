@@ -6,7 +6,8 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
 
 RUN apt-get clean && apt-get update 
 
-RUN apt-get install -y python3 python3-pip language-pack-zh-hans fontconfig git wget  build-essential libsqlite3-dev libpng-dev libjpeg-dev
+RUN apt-get install -y python3 python3-pip language-pack-zh-hans fontconfig git wget \
+  build-essential libsqlite3-dev libpng-dev libjpeg-dev libxft-dev libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev
 
 WORKDIR /app
 

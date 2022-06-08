@@ -8,3 +8,4 @@ celery
 celery[redis]
 flask-apscheduler
 requests
+pymysql

@@ -1,0 +1,8 @@
+flask
+flask_script
+flask_migrate
+werkzeug
+flask_restful
+pillow
+celery
+celery[redis]

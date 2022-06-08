@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加引擎</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/layui-v2.5.4/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" media="all">
+    <style>
+        .layui-form-item .layui-input-company {
+            width: auto;
+            padding-right: 10px;
+            line-height: 38px;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 30px;">
+            <legend>引擎添加</legend>
+            <div>
+
+                <div class="layui-form layuimini-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">引擎名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="engine_name" id="engine_name" lay-reqtext=""
+                                   placeholder="请输入引擎名称"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">目标类型</label>
+                        <div class="layui-input-block" id="flag2">
+                            <input type="radio" name="target_type" value="domain" title="域名">
+                            <input type="radio" name="target_type" value="subdomain" title="子域名">
+                            <input type="radio" name="target_type" value="ip" title="IP" checked="">
+                            <input type="radio" name="target_type" value="ip_port" title="IP端口">
+                            <input type="radio" name="target_type" value="url" title="URL">
+                            <input type="radio" name="target_type" value="url_full" title="URL链接">
+                            <input type="radio" name="target_type" value="keyword" title="关键字">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">备注</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="note" id="note" lay-verify="note"
+                                   placeholder="备注"
+                                   class="layui-input" >
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="setting">确定</button>
+                        </div>
+                    </div>
+
+
+                </div>
+        </fieldset>
+
+        <script src="{{ url_for('static', filename='lib/jquery-3.4.1/jquery-3.4.1.min.js') }}" charset="utf-8"></script>
+        <script src="{{ url_for('static', filename='lib/layui-v2.5.4/layui.js') }}" charset="utf-8"></script>
+        <script>
+            layui.use(['form', 'table'], function () {
+                var form = layui.form,
+                    layer = layui.layer
+
+                var title = "";
+                //监听提交
+                form.on('submit(setting)', function (data) {
+                    //var index = layer.load();
+                    data.field.target_type =  $('#flag2 input[name="target_type"]:checked').val()
+                    $.ajax({
+                        url: "{{ url_for('api_engine_manage') }}",
+                        data: JSON.stringify(data.field),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        async: false,
+                        type: 'post',
+                        success: function (result) {
+                            data = result;
+                            if (data.code == 200) {
+                                layer.alert('添加成功!', {title: title + '提示', icon: 1})
+                                window.location.href = "{{ url_for('html_engine_manage') }}";
+                            } else if (data.code == 201) {
+                                $('#engine_name').val("").focus();
+                                layer.alert('已存在，请重新输入!', {title: title + '提示', icon: 2})
+                                window.location.href = "{{ url_for('html_engine_manage') }}";
+                            } else {
+                                layer.alert('添加失败!', {title: title + '提示', icon: 2})
+                                window.location.href = "{{ url_for('html_engine_manage') }}";
+                            }
+                        }
+                    })
+                    //layer.close(index);
+                    return false;
+                });
+
+            });
+        </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>url</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/layui-v2.5.4/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" media="all">
+    <style>
+        .layui-form-item .layui-input-company {
+            width: auto;
+            padding-right: 10px;
+            line-height: 38px;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 30px;">
+            <legend>url资产</legend>
+            <div>
+                <div style="margin: 10px 10px 10px 10px">
+                    <form class="layui-form layui-form-pane" action="">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">关键字</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="keyword" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <a class="layui-btn" lay-submit="" lay-filter="data-search-btn">搜索</a>
+                            </div>
+                        </div>
+                    </form>
+                    <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+                    <script type="text/html" id="currentTableBar">
+                        <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+                    </script>
+                </div>
+            </div>
+        </fieldset>
+
+
+        <script src="{{ url_for('static', filename='lib/jquery-3.4.1/jquery-3.4.1.min.js') }}" charset="utf-8"></script>
+        <script src="{{ url_for('static', filename='lib/layui-v2.5.4/layui.js') }}" charset="utf-8"></script>
+        <script>
+            layui.use(['form', 'table'], function () {
+                var form = layui.form,
+                    layer = layui.layer,
+                    table = layui.table;
+                var title = "";
+                //表格初始化
+                table.render({
+                    elem: '#currentTableId',
+                    url: "{{ url_for('api_url_manage') }}",
+                    cols: [
+                        [{
+                            field: 'id',
+                            width: 60,
+                            title: 'ID',
+                            sort: true
+                        },
+                        {
+                                field: 'url',
+                                width: 100,
+                                title: 'URL',
+                                sort: true
+                            },{
+                                field: 'status_code',
+                                width: 100,
+                                title: '状态码',
+                                sort: true
+                            },
+                            
+                            {
+                                field: 'title',
+                                width: 100,
+                                title: '标题',
+                                sort: true
+                            },
+
+                            {
+                                field: 'content_length',
+                                width: 100,
+                                title: '长度',
+                                sort: true
+                            },
+
+                            {
+                                field: 'screenshot',
+                                width: 100,
+                                title: '截图',
+                                sort: true
+                            },
+
+                            {
+                                field: 'cms',
+                                width: 100,
+                                title: '指纹',
+                                sort: true
+                            },
+
+
+                            {
+                                field: 'is_waf',
+                                width: 100,
+                                title: '是否WAF',
+                                sort: true
+                            },
+                            {
+                                field: 'raw_response',
+                                width: 100,
+                                title: 'raw_response',
+                                sort: true
+                            },
+                            {
+                                field: 'task_name',
+                                width: 100,
+                                title: '任务名称',
+                                sort: true
+                            },
+                            {
+                                field: 'source',
+                                width: 100,
+                                title: '来源类型',
+                                sort: true
+                            },
+
+                            {
+                                field: 'create_time',
+                                width: 100,
+                                title: '创建时间',
+                                sort: true
+                            },
+                            {
+                                field: 'update_time',
+                                width: 100,
+                                title: '修改时间',
+                                sort: true
+                            },
+                            {
+                                title: '操作',
+                                minWidth: 50,
+                                templet: '#currentTableBar',
+                                fixed: "right",
+                                align: "center"
+                            }
+                        ]
+                    ],
+                    limits: [10, 50, 100, 500, 1000, 10000],
+                    limit: 20,
+                    page: true,
+                    toolbar:true,
+                    totalrow:true
+                });
+
+                // 监听搜索操作
+                form.on('submit(data-search-btn)', function (data) {
+                    var result = JSON.stringify(data.field);
+
+                    //执行搜索重载
+                    table.reload('currentTableId', {
+                        page: {
+                            curr: 1
+                        },
+                        where: {
+                            searchParams: result
+                        }
+                    }, 'data');
+
+                    return false;
+                });
+
+                // 监听删除操作
+                table.on('tool(currentTableFilter)', function (obj) {
+                    var data = obj.data;
+                    if (obj.event === 'delete') {
+                        layer.confirm('确定吗?', function (index) {
+                            $.ajax({
+                                url: "{{ url_for('api_url_manage') }}",
+                                data: JSON.stringify(data),
+                                contentType: 'application/json;charset=UTF-8',
+                                dataType: 'json',
+                                type: 'delete',
+                                success: function (result) {
+                                    data = result;
+                                    if (data.code == 200) {
+                                        layer.alert('删除成功!', {
+                                            title: title + '提示',
+                                            icon: 1
+                                        })
+                                        obj.del();
+                                        layer.close(index);
+                                    } else if (data.code == 202) {
+                                        layer.alert('不存在!', {
+                                            title: title + '提示',
+                                            icon: 2
+                                        })
+                                    } else {
+                                        layer.alert('删除失败!', {
+                                            title: title + '提示',
+                                            icon: 2
+                                        })
+                                    }
+                                }
+                            })
+                        });
+                    } 
+                });
+
+            });
+        </script>
+</body>
+</html>

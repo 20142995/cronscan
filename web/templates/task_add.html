@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加任务</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/layui-v2.5.4/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" media="all">
+    <style>
+        .layui-form-item .layui-input-company {
+            width: auto;
+            padding-right: 10px;
+            line-height: 38px;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 30px;">
+            <legend>任务添加</legend>
+            <div>
+
+                <div class="layui-form layuimini-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">任务名称</label>
+
+                        <div class="layui-input-inline">
+                            <select id="task_name" name="task_name" lay-filter="outUnitList" lay-search>
+                                {% for item in target_groups %}
+                                <option value="{{item}}">{{item}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">引擎名称</label>
+                        <div class="layui-input-block" id="flag3">
+                            {% for engine_name in engines %}
+                            <input type="checkbox" name="task_engine" value="{{engine_name}}" title="{{engine_name}}">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">cron定时</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="cron" id="cron" lay-verify="cron"
+                                   placeholder="为空或 * * * * * * (秒 分 时 日期 月份 星期)"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="setting">确定</button>
+                        </div>
+                    </div>
+
+
+                </div>
+        </fieldset>
+
+        <script src="{{ url_for('static', filename='lib/jquery-3.4.1/jquery-3.4.1.min.js') }}" charset="utf-8"></script>
+        <script src="{{ url_for('static', filename='lib/layui-v2.5.4/layui.js') }}" charset="utf-8"></script>
+        <script>
+            layui.use(['form', 'table'], function () {
+                var form = layui.form,
+                    layer = layui.layer
+
+                var title = "";
+                //监听提交
+                form.on('submit(setting)', function (data) {
+                    //var index = layer.load();
+                    var arr_check = []; //定义一个临时数据
+                    $("input:checkbox[name='task_engine']:checked").each(function() {
+                        arr_check.push($(this).val());  //获取checkbox name=engine 的所有选中值
+                    });
+                    data.field.engine = arr_check.toString(); //替换到原表单中对应的data.field值
+                    data.field.task_name =  $("#task_name").val();
+                    $.ajax({
+                        url: "{{ url_for('api_task_manage') }}",
+                        data: JSON.stringify(data.field),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        async: false,
+                        type: 'post',
+                        success: function (result) {
+                            data = result;
+                            if (data.code == 200) {
+                                layer.alert('添加任务成功!', {title: title + '提示', icon: 1})
+                                window.location.href = "{{ url_for('html_task_manage') }}";
+                            } else if (data.code == 201) {
+                                $('#task_name').val("").focus();
+                                layer.alert('已存在，请重新输入!', {title: title + '提示', icon: 2})
+                            } else {
+                                layer.alert('添加失败!', {title: title + '提示', icon: 2})
+                            }
+                        }
+                    })
+                    //layer.close(index);
+                    return false;
+                });
+
+            });
+        </script>
+</body>
+</html>

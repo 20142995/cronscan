@@ -26,6 +26,12 @@ def init():
         scheduler.add_job(func=update_engine, id='update_engine', trigger='cron',
                           second="0", minute="*/10", replace_existing=True, timezone='Asia/Shanghai')
 
+@app.teardown_request
+def checkin_db(exc):
+    try:
+        db.session.remove()
+    except AttributeError:
+        pass
 
 if __name__ == '__main__':
     scheduler.init_app(app)

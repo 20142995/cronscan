@@ -10,7 +10,7 @@ import threading
 from functools import wraps
 import os
 import re
-from dingtalk import send_text
+from web.utils.dingtalk import send_text
 
 
 def is_ip(value):
